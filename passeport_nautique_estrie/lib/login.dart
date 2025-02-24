@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:passeport_nautique_estrie/db.dart';
@@ -60,9 +59,9 @@ class Login extends StatelessWidget {
                   }
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
+                  backgroundColor: WidgetStateProperty.all<Color>(
                       Colors.white), // Set button background color
-                  shape: MaterialStateProperty.all<OutlinedBorder>(
+                  shape: WidgetStateProperty.all<OutlinedBorder>(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
@@ -143,7 +142,7 @@ class Login extends StatelessWidget {
             lavages.add(lavageMap);
             if (lastLavage != null) {
               await prefs.setString(
-                  'lastLavage$idEmbarcation', dateformat.format(lastLavage!));
+                  'lastLavage$idEmbarcation', dateformat.format(lastLavage));
             } else {
               await prefs.setString('lastLavage$idEmbarcation', 'Aucun lavage');
             }
@@ -166,7 +165,7 @@ class Login extends StatelessWidget {
             misesAEau.add(misesAEauMap);
             if (lastMiseEau != null) {
               await prefs.setString(
-                  'lastMiseEau$idEmbarcation', dateformat.format(lastMiseEau!));
+                  'lastMiseEau$idEmbarcation', dateformat.format(lastMiseEau));
             } else {
               await prefs.setString(
                   'lastMiseEau$idEmbarcation', 'Aucune mise à l\'eau');
