@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:passeport_nautique_estrie/db.dart';
 import 'package:passeport_nautique_estrie/view/pages/home.dart';
-import 'package:passeport_nautique_estrie/view/pages/embarcation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ShareBoat extends StatefulWidget {
@@ -24,7 +23,7 @@ class _ShareBoatState extends State<ShareBoat> {
 
   String dernierLavage = "Aucun lavage";
 
-  String derniereMiseEau = "Aucune mise à l\'eau";
+  String derniereMiseEau = "Aucune mise à l'eau";
 
   bool _isLoading = true;
 

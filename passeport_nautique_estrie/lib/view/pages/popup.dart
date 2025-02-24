@@ -1,14 +1,8 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:intl/intl.dart';
-import 'package:passeport_nautique_estrie/db.dart';
 import 'package:passeport_nautique_estrie/scanner.dart';
 import 'package:passeport_nautique_estrie/view/pages/share_boat.dart';
 import 'package:passeport_nautique_estrie/view/pages/embarcation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PopupMenuUtil {
   static void showPopupMenu(
@@ -73,7 +67,7 @@ class PopupMenuUtil {
   static void showSuccessMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(message),
-      duration: Duration(seconds: 2), // Adjust the duration as needed
+      duration: const Duration(seconds: 2), // Adjust the duration as needed
     ));
   }
 }

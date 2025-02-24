@@ -18,7 +18,7 @@ class _AddBoatPageState extends State<AddBoatPage> {
   final permitController = TextEditingController();
   final controller = AddBoatController();
 
-  _AddBoatPageState({Key? key});
+  _AddBoatPageState();
 
   @override
   void dispose() {
