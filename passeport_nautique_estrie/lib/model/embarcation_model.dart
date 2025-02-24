@@ -47,7 +47,7 @@ class EmbarcationModel {
   }
 
   Future<void> addEmbarcationUtilisateur(
-      String id_embarcation, String nom) async {
+      String idEmbarcation, String nom) async {
     try {
       final connection = await DB.getConnection();
       final prefs = await SharedPreferences.getInstance();
@@ -56,7 +56,7 @@ class EmbarcationModel {
         "CALL ajouter_embarcation_utilisateur(@sub, @id_embarcation, @nom);",
         substitutionValues: {
           "sub": sub,
-          "id_embarcation": id_embarcation,
+          "id_embarcation": idEmbarcation,
           "nom": nom
         },
       );
