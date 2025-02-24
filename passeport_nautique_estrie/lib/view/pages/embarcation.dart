@@ -299,7 +299,7 @@ class _DetailsEmbarcationState extends State<DetailsEmbarcation> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Annuler'),
+              child: const Text('Annuler'),
             ),
             TextButton(
               onPressed: () {
@@ -308,7 +308,7 @@ class _DetailsEmbarcationState extends State<DetailsEmbarcation> {
                 // https://pub.dev/packages/printing
                 Navigator.of(context).pop();
               },
-              child: Text('Imprimer'),
+              child: const Text('Imprimer'),
             ),
           ],
         );
@@ -319,7 +319,7 @@ class _DetailsEmbarcationState extends State<DetailsEmbarcation> {
   static void showSuccessMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(message),
-      duration: Duration(seconds: 2), // Adjust the duration as needed
+      duration: const Duration(seconds: 2), // Adjust the duration as needed
     ));
   }
 }
