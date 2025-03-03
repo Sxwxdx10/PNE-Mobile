@@ -5,7 +5,8 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
 import 'package:passeport_nautique_estrie/db.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:passeport_nautique_estrie/view/pages/sejour_popup.dart';
+ 
 class BarcodeUtils {
   static Future<void> scanQR(BuildContext context,
       String embarcationUtilisateur, Function(String) onSuccess) async {
@@ -17,17 +18,27 @@ class BarcodeUtils {
       qrText = json.decode(barcodeScanRes);
       if (qrText["type"] == "lavage") {
         await addLavageToEmbarcation(embarcationUtilisateur, qrText);
+        await askSejourDuration(context);
         onSuccess('Lavage bien enregistré');
       }
       if (qrText["type"] == "mise à l'eau") {
         await addMiseAEauToEmbarcation(embarcationUtilisateur, qrText);
-        onSuccess('Mise à l\'eau bien enregistré');
+        await askSejourDuration(context);
+        onSuccess('Mise à l\'eau bien enregistrée');
       }
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
     }
   }
-
+ 
+  static Future<void> askSejourDuration(BuildContext context) async {
+    Duration? dureeSejour = await SejourPopup.showSejourDialog(context);
+    if (dureeSejour != null) {
+      String dureeSejourStr = "${dureeSejour.inDays} jours, ${dureeSejour.inHours.remainder(24)} heures, ${dureeSejour.inMinutes.remainder(60)} minutes";
+      print("Durée du séjour : $dureeSejourStr");
+    }
+  }
+ 
   static Future<List<List<dynamic>>> addLavageToEmbarcation(
       String enbarcationUtilisateur, Map lavageFait) async {
     final prefs = await SharedPreferences.getInstance();
@@ -43,12 +54,12 @@ class BarcodeUtils {
     );
     DB.closeConnection(connection);
     DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
-
+ 
     await prefs.setString(
         'lastLavage${results[0][0]}', dateFormat.format(DateTime.now()));
     return results;
   }
-
+ 
   static Future<List<List<dynamic>>> addMiseAEauToEmbarcation(
       String enbarcationUtilisateur, Map MiseEauFait) async {
     final prefs = await SharedPreferences.getInstance();
@@ -63,9 +74,10 @@ class BarcodeUtils {
     );
     DB.closeConnection(connection);
     DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
-
+ 
     await prefs.setString(
         'lastMiseEau${results[0][0]}', dateFormat.format(DateTime.now()));
     return results;
   }
 }
+ 
