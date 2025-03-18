@@ -28,8 +28,8 @@ class _DetailsEmbarcationState extends State<DetailsEmbarcation> {
   DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
   String dernierLavage = "Aucun lavage";
-
-  String derniereMiseEau = "Aucune mise à l\'eau";
+  String derniereMiseEau = "Aucune mise à l'eau";
+  String dureeSejour = "Aucune durée de séjour";
 
   bool _isLoading = true;
 
@@ -57,9 +57,7 @@ class _DetailsEmbarcationState extends State<DetailsEmbarcation> {
           prefs.getString('lastLavage${results[0][5]}') ?? 'Aucun lavage';
       derniereMiseEau = prefs.getString('lastMiseEau${results[0][5]}') ??
           'Aucune mise à l\'eau';
-      print('lastMiseEau${results[0][5]}');
-      print(dernierLavage);
-      print(derniereMiseEau);
+      dureeSejour = prefs.getString('dureeSejour') ?? 'Aucune durée de séjour';
     } catch (e) {
       print("Error fetching data: $e");
       _isLoading = false;
@@ -230,6 +228,8 @@ class _DetailsEmbarcationState extends State<DetailsEmbarcation> {
                 infoLine('Dernier Lavage :', dernierLavage),
                 const SizedBox(height: 10),
                 infoLine('Derniere mise a l\'eau :', derniereMiseEau),
+                const SizedBox(height: 10),
+                infoLine('Durée de séjour :', dureeSejour),
                 const SizedBox(height: 20),
                 Container(
                   alignment: Alignment.center,
@@ -291,7 +291,7 @@ class _DetailsEmbarcationState extends State<DetailsEmbarcation> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Imprimer le code d' 'embarcation?'),
+          title: const Text('Imprimer le code d\'embarcation?'),
           content: const Text(
               'Voulez-vous imprimer le code QR de votre embarcation?'),
           actions: <Widget>[
@@ -305,7 +305,6 @@ class _DetailsEmbarcationState extends State<DetailsEmbarcation> {
               onPressed: () {
                 // Implement printing functionality here
                 // For example, you can use a package like 'printing' to print the QR code
-                // https://pub.dev/packages/printing
                 Navigator.of(context).pop();
               },
               child: const Text('Imprimer'),
