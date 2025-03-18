@@ -1,74 +1,113 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SejourPopup {
   static Future<Duration?> showSejourDialog(BuildContext context) async {
-    int selectedDays = 0;
-    int selectedHours = 0;
-    int selectedMinutes = 0;
+    DateTime? startDate;
+    DateTime? endDate;
 
     return showDialog<Duration>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Durée du séjour'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Veuillez indiquer la durée prévue de votre séjour:'),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Durée du séjour'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildNumberPicker("Jours", 0, 30, (val) => selectedDays = val),
-                  _buildNumberPicker("Heures", 0, 23, (val) => selectedHours = val),
-                  _buildNumberPicker("Minutes", 0, 59, (val) => selectedMinutes = val),
+                  const Text('Sélectionnez la date de début et de fin de votre séjour :'),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () async {
+                      DateTime now = DateTime.now();
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: now,
+                        firstDate: now,
+                        lastDate: DateTime(2100, 12, 31),
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          startDate = picked;
+                          if (endDate != null && endDate!.isBefore(startDate!)) {
+                            endDate = null;
+                          }
+                        });
+                      }
+                    },
+                    child: const Text('Choisir la date de début'),
+                  ),
+                  if (startDate != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        "Début: ${startDate!.toLocal().toString().split(' ')[0]}",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (startDate == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Veuillez choisir la date de début d’abord')),
+                        );
+                        return;
+                      }
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: startDate!,
+                        firstDate: startDate!,
+                        lastDate: DateTime(2100, 12, 31),
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          endDate = picked;
+                        });
+                      }
+                    },
+                    child: const Text('Choisir la date de fin'),
+                  ),
+                  if (endDate != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        "Fin: ${endDate!.toLocal().toString().split(' ')[0]}",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
                 ],
               ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(null);
-              },
-              child: const Text('Annuler'),
-            ),
-            TextButton(
-              onPressed: () {
-                Duration selectedDuration = Duration(
-                  days: selectedDays,
-                  hours: selectedHours,
-                  minutes: selectedMinutes,
-                );
-                Navigator.of(context).pop(selectedDuration);
-              },
-              child: const Text('Confirmer'),
-            ),
-          ],
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(null);
+                  },
+                  child: const Text('Annuler'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    if (startDate != null && endDate != null && endDate!.isAfter(startDate!)) {
+                      Duration selectedDuration = endDate!.difference(startDate!);
+
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setString('dureeSejour', '${selectedDuration.inDays} jours');
+
+                      Navigator.of(context).pop(selectedDuration);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Veuillez choisir des dates valides')),
+                      );
+                    }
+                  },
+                  child: const Text('Confirmer'),
+                ),
+              ],
+            );
+          },
         );
       },
-    );
-  }
-
-  static Widget _buildNumberPicker(String label, int min, int max, Function(int) onSelected) {
-    return Column(
-      children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        SizedBox(
-          height: 100,
-          width: 60,
-          child: ListWheelScrollView.useDelegate(
-            itemExtent: 40,
-            diameterRatio: 1.2,
-            physics: const FixedExtentScrollPhysics(),
-            onSelectedItemChanged: onSelected,
-            childDelegate: ListWheelChildBuilderDelegate(
-              builder: (context, index) => Center(child: Text(index.toString())),
-              childCount: max - min + 1,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

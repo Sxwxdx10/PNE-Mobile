@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:passeport_nautique_estrie/db.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:passeport_nautique_estrie/view/pages/sejour_popup.dart';
- 
+
 class BarcodeUtils {
   static Future<void> scanQR(BuildContext context,
       String embarcationUtilisateur, Function(String) onSuccess) async {
@@ -30,15 +30,16 @@ class BarcodeUtils {
       barcodeScanRes = 'Failed to get platform version.';
     }
   }
- 
+
   static Future<void> askSejourDuration(BuildContext context) async {
     Duration? dureeSejour = await SejourPopup.showSejourDialog(context);
     if (dureeSejour != null) {
-      String dureeSejourStr = "${dureeSejour.inDays} jours, ${dureeSejour.inHours.remainder(24)} heures, ${dureeSejour.inMinutes.remainder(60)} minutes";
-      print("Durée du séjour : $dureeSejourStr");
+      String dureeSejourStr = "${dureeSejour.inDays} jour${dureeSejour.inDays > 1 ? 's' : ''}";
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('dureeSejour', dureeSejourStr);
     }
   }
- 
+
   static Future<List<List<dynamic>>> addLavageToEmbarcation(
       String enbarcationUtilisateur, Map lavageFait) async {
     final prefs = await SharedPreferences.getInstance();
@@ -54,12 +55,12 @@ class BarcodeUtils {
     );
     DB.closeConnection(connection);
     DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
- 
+
     await prefs.setString(
         'lastLavage${results[0][0]}', dateFormat.format(DateTime.now()));
     return results;
   }
- 
+
   static Future<List<List<dynamic>>> addMiseAEauToEmbarcation(
       String enbarcationUtilisateur, Map MiseEauFait) async {
     final prefs = await SharedPreferences.getInstance();
@@ -74,10 +75,9 @@ class BarcodeUtils {
     );
     DB.closeConnection(connection);
     DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
- 
+
     await prefs.setString(
         'lastMiseEau${results[0][0]}', dateFormat.format(DateTime.now()));
     return results;
   }
 }
- 
