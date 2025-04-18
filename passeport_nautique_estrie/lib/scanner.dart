@@ -22,22 +22,26 @@ class BarcodeUtils {
         onSuccess('Lavage bien enregistré');
       }
       if (qrText["type"] == "mise à l'eau") {
-        await addMiseAEauToEmbarcation(embarcationUtilisateur, qrText);
-        await askSejourDuration(context);
-        onSuccess('Mise à l\'eau bien enregistrée');
+        var sejourDuration = await askSejourDuration(context);
+        if (sejourDuration != null) {
+          await addMiseAEauToEmbarcation(embarcationUtilisateur, qrText, sejourDuration['days']);
+          onSuccess('Mise à l\'eau bien enregistrée');
+        }
       }
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
     }
   }
 
-  static Future<void> askSejourDuration(BuildContext context) async {
-    Duration? dureeSejour = await SejourPopup.showSejourDialog(context);
-    if (dureeSejour != null) {
-      String dureeSejourStr = "${dureeSejour.inDays} jour${dureeSejour.inDays > 1 ? 's' : ''}";
+  static Future<Map<String, dynamic>?> askSejourDuration(BuildContext context) async {
+    var sejourInfo = await SejourPopup.showSejourDialog(context);
+    if (sejourInfo != null) {
+      String dureeSejourStr = "${sejourInfo['days']} jour${sejourInfo['days'] > 1 ? 's' : ''}";
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('dureeSejour', dureeSejourStr);
+      return sejourInfo;
     }
+    return null;
   }
 
   static Future<List<List<dynamic>>> addLavageToEmbarcation(
@@ -62,15 +66,16 @@ class BarcodeUtils {
   }
 
   static Future<List<List<dynamic>>> addMiseAEauToEmbarcation(
-      String enbarcationUtilisateur, Map MiseEauFait) async {
+      String enbarcationUtilisateur, Map MiseEauFait, int dureeSejour) async {
     final prefs = await SharedPreferences.getInstance();
     final connection = await DB.getConnection();
     var results = await connection.query(
-      "SELECT * from add_mise_eau_no_remove(@p_planEau,@id_embarcation_utilisateur,@code)",
+      "SELECT * from add_mise_eau_no_remove(@p_planEau,@id_embarcation_utilisateur,@code,@duree)",
       substitutionValues: {
         "p_planEau": MiseEauFait["plan eau"],
         "id_embarcation_utilisateur": enbarcationUtilisateur,
         "code": MiseEauFait["code unique"],
+        "duree": dureeSejour,
       },
     );
     DB.closeConnection(connection);

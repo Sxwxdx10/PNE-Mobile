@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SejourPopup {
-  static Future<Duration?> showSejourDialog(BuildContext context) async {
+  static Future<Map<String, dynamic>?> showSejourDialog(BuildContext context) async {
     DateTime? startDate;
     DateTime? endDate;
 
-    return showDialog<Duration>(
+    return showDialog<Map<String, dynamic>>(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
@@ -90,11 +90,15 @@ class SejourPopup {
                   onPressed: () async {
                     if (startDate != null && endDate != null && endDate!.isAfter(startDate!)) {
                       Duration selectedDuration = endDate!.difference(startDate!);
+                      int daysCount = selectedDuration.inDays;
 
                       final prefs = await SharedPreferences.getInstance();
-                      await prefs.setString('dureeSejour', '${selectedDuration.inDays} jours');
+                      await prefs.setString('dureeSejour', '$daysCount jours');
 
-                      Navigator.of(context).pop(selectedDuration);
+                      Navigator.of(context).pop({
+                        'duration': selectedDuration,
+                        'days': daysCount,
+                      });
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Veuillez choisir des dates valides')),

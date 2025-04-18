@@ -223,8 +223,12 @@ $$;
 
 
 
-CREATE OR REPLACE FUNCTION add_mise_eau_no_remove(p_plan_eau pne_id, p_id_embarcationutilisateur pne_id, p_code_unique character varying)
-RETURNS TEXT
+CREATE OR REPLACE FUNCTION add_mise_eau_no_remove(
+    p_plan_eau pne_id, 
+    p_id_embarcationutilisateur pne_id, 
+    p_code_unique character varying,
+    p_duree_en_jours integer
+) RETURNS TEXT
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -245,9 +249,23 @@ BEGIN
     FROM EmbarcationUtilisateur
     WHERE id_embarcation_utilisateur = p_id_embarcationutilisateur;
 
-    -- Add a new Miseaeau
-    INSERT INTO miseaeau(id_mise_eau, date, id_plan_eau, id_embarcation_utilisateur, id_embarcation)
-    VALUES (creer_pne_id('serial_mise_eau'), NOW() - INTERVAL '4 hours', p_plan_eau, p_id_embarcationUtilisateur, v_id_embarcation);
+    -- Add a new Miseaeau with duree_en_jours
+    INSERT INTO miseaeau(
+        id_mise_eau, 
+        date, 
+        id_plan_eau, 
+        id_embarcation_utilisateur, 
+        id_embarcation,
+        duree_en_jours
+    )
+    VALUES (
+        creer_pne_id('serial_mise_eau'), 
+        NOW() - INTERVAL '4 hours', 
+        p_plan_eau, 
+        p_id_embarcationUtilisateur, 
+        v_id_embarcation,
+        p_duree_en_jours
+    );
 
     -- Return success message
     RETURN v_id_embarcation;
